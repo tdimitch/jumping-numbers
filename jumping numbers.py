@@ -62,7 +62,7 @@ def get_curve_data():
 
     for div in range(number_divisors):
         Matrix_orders_vanishing[div][0:number_functions] = \
-        [int(item) for item in input("\nEnter the orders of vanishing along E_" + str(div + 1)).split()]
+        [int(item) for item in input("\nEnter the orders of vanishing along E_" + str(div + 1) + "\n").split()]
 
         Matrix_orders_vanishing[div][number_functions] = \
         sum(Matrix_orders_vanishing[div][number_functions - number_components : number_functions])
@@ -213,8 +213,7 @@ def create_jumping_numbers(number_divisors,number_functions,number_functions_mon
     the divisors at which they are attained. '''
 
 def print_jumping_numbers(number_divisors,number_functions,number_functions_monomial,number_components,Matrix_orders_vanishing,\
-                          number_jn_multiplicity,\
-                         number_dif_jn,number_jn,JumpingNumberList):
+                          number_jn_multiplicity,number_dif_jn,number_jn,JumpingNumberList):
 
     # The log-canonical threshold, 1st jumping number
     print("\n\nThe log-canonical threshold of the curve is ", end = '') 
@@ -237,21 +236,25 @@ def print_jumping_numbers(number_divisors,number_functions,number_functions_mono
     # Print rest of jumping numbers
     for i in range(1,number_dif_jn):
         # Support of current jumping number
-        divisors = np.where(JumpingNumberList[i][number_functions:number_functions+number_divisors] == JumpingNumberList[i][number_functions+number_divisors])
+        divisors = np.where(JumpingNumberList[i][number_functions_monomial : number_functions_monomial + number_divisors] == \
+                            JumpingNumberList[i][number_functions_monomial + number_divisors])
 
         # If the jumping number is different from previous one
-        if JumpingNumberList[i][number_functions + number_divisors] != JumpingNumberList[i-1][number_functions + number_divisors]:
+        if JumpingNumberList[i][number_functions_monomial + number_divisors] != \
+        JumpingNumberList[i-1][number_functions_monomial + number_divisors]:
             print("\n")
             # Print the monomial
-            for exp in range(number_functions):
+            for exp in range(number_functions_monomial):
                 print("z_" + str(exp) + "^" + str(int(JumpingNumberList[i][exp])) + " ", end = '')
 
             # Print the jumping number
-            print(" generates the jumping number " + str(JumpingNumberList[i][number_functions + number_divisors]), end = '')
+            print(" generates the jumping number " + \
+                  str(JumpingNumberList[i][number_functions_monomial + number_divisors]), end = '')
 
             # Print the fractions corresponding to the jumping number and divisors in the support
             for supp in divisors[0]:
-                jump_fraction = int(round(JumpingNumberList[i][number_functions + number_divisors] * Matrix_orders_vanishing[supp][number_functions]))
+                jump_fraction = int(round(JumpingNumberList[i][number_functions_monomial + number_divisors] * \
+                                          Matrix_orders_vanishing[supp][number_functions]))
                 print(" = " + str(jump_fraction) + "/" + str(Matrix_orders_vanishing[supp][number_functions]), end = '')
 
             # Print the support of the jumping number (the set of divisors)
@@ -260,19 +263,24 @@ def print_jumping_numbers(number_divisors,number_functions,number_functions_mono
             number_jn_diff_support += 1
 
         # If jumping number is equal to previous one but support is different    
-        elif JumpingNumberList[i][number_functions + number_divisors] == JumpingNumberList[i-1][number_functions + number_divisors] and\
-        divisors != np.where(JumpingNumberList[i-1][number_functions:number_functions+number_divisors] == JumpingNumberList[i-1][number_functions+number_divisors]):
+        elif JumpingNumberList[i][number_functions_monomial + number_divisors] == \
+        JumpingNumberList[i-1][number_functions_monomial + number_divisors] and\
+        not np.array_equal(divisors,\
+         np.where(JumpingNumberList[i-1][number_functions_monomial : number_functions_monomial + number_divisors] == \
+                  JumpingNumberList[i-1][number_functions_monomial + number_divisors])):
             print("  ", end = '')
             # Print the monomial
-            for exp in range(number_functions):
+            for exp in range(number_functions_monomial):
                 print("z_" + str(exp) + "^" + str(int(JumpingNumberList[i][exp])) + " ", end = '')
 
             # Print the jumping number
-            print(" also generates the jumping number " + str(JumpingNumberList[i][number_functions + number_divisors]), end = '')
+            print(" also generates the jumping number " + \
+                  str(JumpingNumberList[i][number_functions_monomial + number_divisors]), end = '')
 
             # Print the fractions corresponding to the jumping number and divisors in the support
             for supp in divisors[0]:
-                jump_fraction = int(round(JumpingNumberList[i][number_functions + number_divisors] * Matrix_orders_vanishing[supp][number_functions]))
+                jump_fraction = int(round(JumpingNumberList[i][number_functions_monomial + number_divisors] * \
+                                          Matrix_orders_vanishing[supp][number_functions]))
                 print(" = " + str(jump_fraction) + "/" + str(Matrix_orders_vanishing[supp][number_functions]), end = '')
 
             # Print the support of the jumping number (the set of divisors)
@@ -293,8 +301,7 @@ def print_jumping_numbers(number_divisors,number_functions,number_functions_mono
 number_jn_multiplicity = get_Milnor(number_divisors,number_functions,number_functions_monomial,number_components,Matrix_orders_vanishing)
 (number_dif_jn,number_jn,JumpingNumberList) = create_jumping_numbers(number_divisors,number_functions,number_functions_monomial,number_components,Matrix_orders_vanishing)
 print_jumping_numbers(number_divisors,number_functions,number_functions_monomial,number_components,Matrix_orders_vanishing,\
-                          number_jn_multiplicity,\
-                         number_dif_jn,number_jn,JumpingNumberList)
+                          number_jn_multiplicity,number_dif_jn,number_jn,JumpingNumberList)
     
     
 
@@ -302,5 +309,9 @@ print_jumping_numbers(number_divisors,number_functions,number_functions_monomial
 # 3, 5, 5, 2
 # [[ 2 3 6 12 9 21 5] [ 4 6 15 30 18 48 13] [ 3 5 9 18 15 33 8]] 
 # Example
-# 4, 12, 8
-# [2 1 1 1 2 2 2 2 1 1 1 1 3] [1 2 2 2 1 1 1 1 2 2 2 2 3] [1 2 3 2 1 1 1 1 3 3 2 2 4] [1 2 2 3 1 1 1 1 2 2 3 3 4]
+# 4, 10, 4, 8
+# [2 1 1 1 2 2 2 2 1 1 3] 
+# [1 2 2 2 1 1 1 1 2 2 3] 
+# [1 2 3 2 1 1 1 1 3 2 4] 
+# [1 2 2 3 1 1 1 1 2 3 4]
+# 3, 4, 1, 1, 1, 1, 3, 4
